@@ -1,1 +1,586 @@
-<!-- temporal -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Reencuentros EGB 1984/85</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --bg: #f5f0e8;
+      --card: #ffffff;
+      --accent: #e09b3d;
+      --accent-dark: #b87418;
+      --text: #333333;
+      --muted: #777777;
+      --shadow: 0 10px 25px rgba(0,0,0,0.12);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px 16px 48px;
+    }
+
+    header {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      margin-bottom: 24px;
+      display: grid;
+      grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.2fr);
+      gap: 18px;
+      align-items: center;
+    }
+
+    header img {
+      width: 100%;
+      height: auto;
+      border-radius: var(--radius);
+      object-fit: contain;
+      max-height: none;
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      margin-bottom: 6px;
+    }
+
+    header h2 {
+      font-size: 1rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .tagline {
+      font-size: 0.95rem;
+      margin-bottom: 10px;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 10px 0 0;
+    }
+
+    .chip {
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #f1e1cb;
+      color: #6b400d;
+    }
+
+    section {
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .section-title span {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px 16px 18px;
+    }
+
+    /* Timeline */
+    .timeline {
+      display: grid;
+      gap: 10px;
+    }
+
+    .event {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid #f0e0cc;
+      background: #fffaf3;
+    }
+
+    .event-year {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--accent-dark);
+      min-width: 70px;
+    }
+
+    .event-info-main {
+      font-size: 0.95rem;
+    }
+
+    .event-info-main .place {
+      font-weight: 600;
+    }
+
+    .event-info-main .date {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .event-stats {
+      text-align: right;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .event-stats strong {
+      color: var(--text);
+      display: block;
+    }
+
+    /* Charts */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    .chart-wrapper {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px 14px 10px;
+    }
+
+    .chart-title {
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+      color: var(--muted);
+    }
+
+    /* Places */
+    .places-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+      font-size: 0.85rem;
+    }
+
+    .place-chip {
+      background: #f4ebe2;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    /* Gallery */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+    }
+
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+      border-radius: 14px;
+      background: #ddd;
+      aspect-ratio: 4/3;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.35s ease;
+    }
+
+    .gallery-item:hover img {
+      transform: scale(1.05);
+    }
+
+    .gallery-caption {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 4px 8px 5px;
+      font-size: 0.75rem;
+      background: linear-gradient(to top, rgba(0,0,0,0.55), transparent);
+      color: #fff;
+    }
+
+    footer {
+      margin-top: 20px;
+      font-size: 0.8rem;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    @media (max-width: 780px) {
+      header {
+        grid-template-columns: 1fr;
+      }
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- CABECERA -->
+  <header>
+    <img src="orla_egb.jpg" alt="Orla EGB 1984/85" />
+
+    <div>
+      <h1>Reencuentros EGB 1984/85</h1>
+      <h2>Historia de nuestras quedadas</h2>
+      <p class="tagline">
+        Desde la primera quedada en 1994 hasta la de 2025: más de tres décadas
+        reuniendo a la misma pandilla de EGB.
+      </p>
+      <div class="chips">
+        <div class="chip">Primera quedada: 1994</div>
+        <div class="chip">Última quedada: 2025</div>
+        <div class="chip" id="totalAsistChip"></div>
+        <div class="chip" id="numQuedadasChip"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- TIMELINE -->
+  <section>
+    <div class="section-title">
+      Línea de tiempo
+      <span>Fechas, lugares y asistencia</span>
+    </div>
+    <div class="card">
+      <div id="timeline" class="timeline"></div>
+    </div>
+  </section>
+
+  <!-- GRÁFICOS -->
+  <section>
+    <div class="section-title">
+      Estadísticas
+      <span>Asistencia total y por género</span>
+    </div>
+    <div class="charts-grid">
+      <div class="chart-wrapper">
+        <div class="chart-title">Asistencia total por quedada</div>
+        <canvas id="totalChart" height="180"></canvas>
+      </div>
+      <div class="chart-wrapper">
+        <div class="chart-title">Hombres vs mujeres</div>
+        <canvas id="genderChart" height="180"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- LUGARES -->
+  <section>
+    <div class="section-title">
+      Lugares
+      <span>Dónde nos hemos reencontrado</span>
+    </div>
+    <div class="card">
+      <p style="font-size:0.9rem; margin-bottom:6px;">
+        Estos son los bares y locales donde se han celebrado las quedadas:
+      </p>
+      <div id="places" class="places-list"></div>
+    </div>
+  </section>
+
+  <!-- GALERÍA -->
+  <section>
+    <div class="section-title">
+      Galería de quedadas
+      <span>Una foto por año</span>
+    </div>
+    <div class="card">
+      <div class="gallery-grid" id="gallery"></div>
+    </div>
+  </section>
+
+  <footer>
+    Reencuentros EGB 1984/85 · Hecho con cariño para el grupo ❤
+  </footer>
+</div>
+
+<script>
+  // ======================
+  // DATOS DE LAS QUEDADAS
+  // ======================
+  const events = [
+    {
+      year: 1994,
+      date: "1994",
+      place: "Bar la Catedral",
+      men: null,
+      women: null,
+      img: null   // SIN FOTO → no se mostrará en la galería
+    },
+    {
+      year: 2015,
+      date: "31/01/2015",
+      place: "Bar Ismael en el Mentidero",
+      men: 13,
+      women: 11,
+      img: "2015_1.jpg"
+    },
+    {
+      year: 2015,
+      date: "21/11/2015",
+      place: "Cuesta de las Calesas",
+      men: 11,
+      women: 11,
+      img: "2015_2.jpg"
+    },
+    {
+      year: 2016,
+      date: "19/11/2016",
+      place: "Cuesta de las Calesas",
+      men: 8,
+      women: 9,
+      img: "2016.jpg"
+    },
+    {
+      year: 2017,
+      date: "25/11/2017",
+      place: "Calle Abreu",
+      men: 8,
+      women: 7,
+      img: "2017.jpg"
+    },
+    {
+      year: 2018,
+      date: "17/11/2018",
+      place: "La Vendimia",
+      men: 10,
+      women: 3,
+      img: "2018.jpg"
+    },
+    {
+      year: 2019,
+      date: "11/09/2019",
+      place: "La Vendimia",
+      men: 12,
+      women: 9,
+      img: "2019.jpg"
+    },
+    {
+      year: 2021,
+      date: "16/10/2021",
+      place: "Mari Jose",
+      men: 5,
+      women: 6,
+      img: "2021.jpg"
+    },
+    {
+      year: 2022,
+      date: "19/11/2022",
+      place: "Cuesta de las Calesas",
+      men: 10,
+      women: 8,
+      img: "2022.jpg"
+    },
+    {
+      year: 2023,
+      date: "04/11/2023",
+      place: "Serrayo Mentidero",
+      men: 8,
+      women: 7,
+      img: "2023.jpg"
+    },
+    {
+      year: 2024,
+      date: "23/11/2024",
+      place: "Club de Tenis",
+      men: 6,
+      women: 7,
+      img: "2024.jpg"
+    },
+    {
+      year: 2025,
+      date: "15/11/2025",
+      place: "La Atrevida Paseo Marítimo",
+      men: 5,
+      women: 6,
+      img: "2025.jpg"
+    }
+  ];
+
+  // ======================
+  // RENDER TIMELINE
+  // ======================
+  const timelineEl = document.getElementById("timeline");
+
+  events.forEach(ev => {
+    const total = (ev.men ?? 0) + (ev.women ?? 0);
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "event";
+
+    wrapper.innerHTML = `
+      <div class="event-year">${ev.year}</div>
+      <div class="event-info-main">
+        <div class="place">${ev.place}</div>
+        <div class="date">${ev.date}</div>
+      </div>
+      <div class="event-stats">
+        ${
+          ev.men == null && ev.women == null
+            ? `<strong>Sin datos</strong>`
+            : `<strong>Total: ${total}</strong>
+               <span>${ev.men} H · ${ev.women} M</span>`
+        }
+      </div>
+    `;
+
+    timelineEl.appendChild(wrapper);
+  });
+
+
+  // ======================
+  // CABECERA – CONTADORES
+  // ======================
+  const totalAsist = events.reduce((sum, ev) => {
+    if (ev.men == null || ev.women == null) return sum;
+    return sum + ev.men + ev.women;
+  }, 0);
+
+  document.getElementById("totalAsistChip").textContent =
+    "Personas totales (con datos): " + totalAsist;
+
+  document.getElementById("numQuedadasChip").textContent =
+    "Quedadas: " + events.length;
+
+
+  // ======================
+  // LISTA DE LUGARES
+  // ======================
+  const placesCount = {};
+  events.forEach(ev => {
+    placesCount[ev.place] = (placesCount[ev.place] || 0) + 1;
+  });
+
+  const placesEl = document.getElementById("places");
+
+  Object.entries(placesCount).forEach(([place, count]) => {
+    const chip = document.createElement("div");
+    chip.className = "place-chip";
+    chip.textContent = `${place} · ${count} vez${count > 1 ? "es" : ""}`;
+    placesEl.appendChild(chip);
+  });
+
+
+  // ======================
+  // GALERÍA (solo eventos con foto)
+  // ======================
+  const galleryEl = document.getElementById("gallery");
+
+  events.filter(ev => ev.img).forEach(ev => {
+    const item = document.createElement("div");
+    item.className = "gallery-item";
+
+    item.innerHTML = `
+      <img src="${ev.img}" alt="Quedada ${ev.year}">
+      <div class="gallery-caption">${ev.year} · ${ev.place}</div>
+    `;
+
+    galleryEl.appendChild(item);
+  });
+
+
+  // ======================
+  // GRÁFICOS
+  // ======================
+  const labels = events.map(ev => ev.year + " " + ev.place.split(" ")[0]);
+  const totals = events.map(ev =>
+    ev.men == null || ev.women == null ? null : ev.men + ev.women
+  );
+  const menData = events.map(ev => ev.men);
+  const womenData = events.map(ev => ev.women);
+
+  const totalCtx = document.getElementById("totalChart").getContext("2d");
+  const genderCtx = document.getElementById("genderChart").getContext("2d");
+
+  new Chart(totalCtx, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "Asistencia total",
+          data: totals,
+          tension: 0.25,
+          borderWidth: 2,
+          pointRadius: 3
+        }
+      ]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { stepSize: 2 }
+        }
+      }
+    }
+  });
+
+  new Chart(genderCtx, {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "Hombres",
+          data: menData,
+          borderWidth: 1
+        },
+        {
+          label: "Mujeres",
+          data: womenData,
+          borderWidth: 1
+        }
+      ]
+    },
+    options: {
+      scales: {
+        y: { beginAtZero: true, ticks: { stepSize: 2 } }
+      }
+    }
+  });
+</script>
+
+</body>
+</html>
+
